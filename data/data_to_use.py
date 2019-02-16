@@ -2,40 +2,59 @@ import pandas as pd
 from scipy.io.arff import loadarff
 
 
+# Shrikanth - enable or disable this flag to turn on/off the pre-processing
+Mean = True # True then pre-processing on false otherwise
+
+def transform(df_data):
+
+    if Mean:
+        colCount = len(df_data.columns)
+        upto = colCount - 1
+        meanCol = df_data.iloc[:, 0: upto].mean(axis=1)
+
+        df_data.drop(df_data.columns[range(0, colCount - 1)], axis=1, inplace=True)
+        df_data.insert(0, 'mean', meanCol)
+
+    return df_data
+
+
+
+prefix = "./data/"
+# prefix = ""
 def data_albrecht():
-    raw_data = loadarff("./data/albrecht.arff")
+    raw_data = loadarff(prefix + "albrecht.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_alb = df_data.drop(columns=['FPAdj', 'RawFPcounts', 'AdjFP'])
-    return new_alb
+    return transform(new_alb)
 
 
 def data_china():
-    raw_data = loadarff("./data/china.arff")
+    raw_data = loadarff(prefix + "china.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_chn = df_data.drop(columns=['ID', 'AFP', 'Added', 'Changed', 'Deleted', 'PDR_AFP', 'PDR_UFP', 'NPDR_AFP'
         , 'NPDU_UFP', 'Dev.Type', 'Duration', 'N_effort'])
-    return new_chn
+    return transform(new_chn)
 
 
 def data_desharnais():
-    raw_data = loadarff("./data/desharnais.arff")
+    raw_data = loadarff(prefix + "desharnais.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_desh = df_data.drop(index=[37, 43, 65, 74],
                             columns=['Project', 'YearEnd', 'Envergure', 'PointsNonAjust', 'Language'])
     columnsTitles = ['TeamExp', 'ManagerExp', 'Length', 'Transactions', 'Entities', 'PointsAdjust', 'Effort']
     new_desh = new_desh.reindex(columns=columnsTitles)
     new_desh = new_desh.drop(columns=['Length'])
-    return new_desh
+    return transform(new_desh)
 
 
 def data_finnish():
-    raw_data = loadarff("./data/finnish.arff")
+    raw_data = loadarff(prefix  + "finnish.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_finn = df_data.drop(columns=['ID'])
     columnsTitles = ['hw', 'at', 'FP', 'co', 'prod', 'lnsize', 'lneff', 'dev.eff.hrs.']
     new_finn = new_finn.reindex(columns=columnsTitles)
     new_finn = new_finn.drop(columns=['prod', 'lnsize', 'lneff'])
-    return new_finn
+    return transform(new_finn)
 
 
 def data_isbsg10():
@@ -80,14 +99,14 @@ def data_isbsg10():
     ]
     df_isbsg10 = pd.DataFrame(raw_data, columns=['Data_Quality','UFP','IS','DP','LT','PPL','CA','FS','RS',
                                                  'Recording_Method','FPS','Effort'])
-    return df_isbsg10
+    return transform(df_isbsg10)
 
 
 def data_kemerer():
-    raw_data = loadarff("./data/kemerer.arff")
+    raw_data = loadarff(prefix + "kemerer.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_keme = df_data.drop(columns=['ID', 'Duration', 'KSLOC', 'RAWFP'])
-    return new_keme
+    return transform(new_keme)
 
 
 def data_kitchenham():
@@ -241,21 +260,21 @@ def data_kitchenham():
     df_kitch = pd.DataFrame(raw_data, columns=['code','type','duration','function_points',
                                                'estimate','estimate_method','effort'])
     new_kitch = df_kitch.drop(columns=['duration', 'estimate', 'estimate_method'])
-    return new_kitch
+    return transform(new_kitch)
 
 
 def data_maxwell():
-    raw_data = loadarff("./data/maxwell.arff")
+    raw_data = loadarff(prefix + "maxwell.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_maxw = df_data.drop(columns=['Syear', 'Duration', 'Time'])
-    return new_maxw
+    return transform(new_maxw)
 
 
 def data_miyazaki():
-    raw_data = loadarff("./data/miyazaki94.arff")
+    raw_data = loadarff(prefix + "miyazaki94.arff")
     df_data = pd.DataFrame(raw_data[0])
     new_miya = df_data.drop(columns=['ID', 'KLOC'])
-    return new_miya
+    return transform(new_miya)
 
 
 def latex_print_detail(func):
@@ -290,4 +309,12 @@ if __name__ == '__main__':
     # latex_print_all_details()
     # print(data_kitchenham().shape)
     # latex_print_detail(data_albrecht)
+    print(data_albrecht())
     print(data_china())
+    print(data_desharnais())
+    print(data_finnish())
+    print(data_isbsg10())
+    print(data_kemerer())
+    print(data_kitchenham())
+    print(data_maxwell())
+    print(data_miyazaki())
